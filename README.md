@@ -1,2 +1,2 @@
 # CheckLinks
-Library that checks is a collections of urls are good or broken.
+Library that checks if a collection of urls is good or broken.
