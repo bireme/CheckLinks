@@ -46,17 +46,20 @@ class GetFileLines(file: File,
             Some(charset.decode(buffer).toString())
           }
         }
-        case i if (i == 10) => { // end of line
-          buffer.flip()
-          Some(charset.decode(buffer).toString())
+        case i if ((i == 10) || (i == 13)) => { // end of line or carriage return
+          if (buffer.position() == 0) getLine0()
+          else {
+            buffer.flip()
+            Some(charset.decode(buffer).toString())
+          }
         }
         case i if (i > Character.MAX_VALUE) => { // invalid char
           buffer.put('?'.toByte)
           getLine0()
         }
-        case i => {
+        case i => { // typical char
           buffer.put(i.toByte)
-          getLine0()  // typical char
+          getLine0()
         }
       }
     }
