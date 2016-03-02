@@ -20,3 +20,9 @@
 [0m[[0mdebug[0m] [0m	/home/heitor/.ivy2/cache/org.mongodb/casbah-query_2.11/jars/casbah-query_2.11-3.0.0.jar[0m
 [0m[[0mdebug[0m] [0m	/home/heitor/.ivy2/cache/org.mongodb/casbah-gridfs_2.11/jars/casbah-gridfs_2.11-3.0.0.jar[0m
 [0m[[0mdebug[0m] [0mWaiting for thread run-main-0 to terminate.[0m
+[0m[[0mdebug[0m] [0m	Thread run-main-0 exited.[0m
+[0m[[0mdebug[0m] [0mWaiting for thread CheckLinksApp-akka.actor.default-dispatcher-10 to terminate.[0m
+[0m[[0mdebug[0m] [0m	Thread CheckLinksApp-akka.actor.default-dispatcher-10 exited.[0m
+[0m[[0mdebug[0m] [0mInterrupting remaining threads (should be all daemons).[0m
+[0m[[0mdebug[0m] [0mSandboxed run complete..[0m
+[0m[[0mdebug[0m] [0mExited with code 0[0m
