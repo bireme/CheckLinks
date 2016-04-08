@@ -194,18 +194,19 @@ public class CheckUrl {
     }
 
     private static void usage() {
-        System.err.println("usage: CheckUrl <url>");
+        System.err.println("usage: CheckUrl <url> [--allContent]");
         System.exit(-1);
     }
 
     public static void main(final String[] args) throws IOException {
-        if (args.length != 1) {
+        if (args.length < 1) {
              usage();
         }
         final String url = args[0];
+        boolean onlyHeader = !((args.length > 1) && (args[1].equals("--allContent")));
 
         System.out.println();
         System.out.println("URL=[" + url + "] ");
-        System.out.println("ErrCode=" + CheckUrl.check(url, true));
+        System.out.println("ErrCode=" + CheckUrl.check(url, onlyHeader));
     }
 }
