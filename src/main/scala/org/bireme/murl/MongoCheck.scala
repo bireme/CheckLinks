@@ -41,7 +41,7 @@ object MongoCheck extends App {
 
   private def isBrokenDocument(doc: MongoDBObject) : Boolean = {
     doc.get("burl") match {
-      case Some(url: String) => CheckUrl.isBroken(CheckUrl.check(url, true))
+      case Some(url: String) => CheckUrl.isBroken(CheckUrl.check(url, false))
       case _ => true
     }
   }

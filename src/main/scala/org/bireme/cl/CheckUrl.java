@@ -111,7 +111,7 @@ public class CheckUrl {
             System.err.println(ioe.getMessage());
         	}
         }
-        return ((responseCode == 500) && checkOnlyHeader)
+        return (((responseCode == 403)||(responseCode == 500)) && checkOnlyHeader)
                                             ? check(url, false) : responseCode;
     }
 
