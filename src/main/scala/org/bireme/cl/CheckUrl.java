@@ -60,6 +60,7 @@ public class CheckUrl {
     public static final int SSL_PROTOCOL_EXCEPTION = 1012;
     public static final int SSL_HANDSHAKE_EXCEPTION = 1013;
     public static final int SSL_UNVERIFIED_PEER_EXCEPTION = 1014;
+    public static final int NO_HTTP_RESPONSE_EXCEPTION = 1015;
 
     public static final int UNKNOWN = 1100;
 
@@ -161,6 +162,8 @@ public class CheckUrl {
           code =  SSL_HANDSHAKE_EXCEPTION;
         } else if (ex instanceof SSLPeerUnverifiedException) {
           code = SSL_UNVERIFIED_PEER_EXCEPTION;
+        } else if (ex instanceof NoHttpResponseException) {
+          code = NO_HTTP_RESPONSE_EXCEPTION;
         } else {
           final String msg = ex.getMessage();
           final String lmsg = (msg == null) ? "" : msg.toLowerCase();

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CHECK_LINKS_HOME=/home/users/heitor.barbieri/sbt-projects/CheckLinks
+CHECK_LINKS_HOME=/home/javaapps/sbt-projects/CheckLinks
 
 if [ "$#" -lt 4 ]; then
   echo "usage: <inFile> <outGoodFile> <outBrokenFile> <outMongoBrokenFile> [<encoding>]"

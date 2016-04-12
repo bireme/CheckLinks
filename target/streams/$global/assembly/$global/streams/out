@@ -1,18 +1,18 @@
 [0m[[0minfo[0m] [0mIncluding: casbah-commons_2.11-3.0.0.jar[0m
 [0m[[0minfo[0m] [0mIncluding: httpclient-4.5.1.jar[0m
 [0m[[0minfo[0m] [0mIncluding: mongo-java-driver-3.0.4.jar[0m
-[0m[[0minfo[0m] [0mIncluding: scala-library-2.11.7.jar[0m
 [0m[[0minfo[0m] [0mIncluding: nscala-time_2.11-1.0.0.jar[0m
-[0m[[0minfo[0m] [0mIncluding: joda-time-2.3.jar[0m
+[0m[[0minfo[0m] [0mIncluding: scala-library-2.11.7.jar[0m
 [0m[[0minfo[0m] [0mIncluding: httpcore-4.4.3.jar[0m
+[0m[[0minfo[0m] [0mIncluding: joda-time-2.3.jar[0m
 [0m[[0minfo[0m] [0mIncluding: commons-logging-1.2.jar[0m
-[0m[[0minfo[0m] [0mIncluding: joda-convert-1.2.jar[0m
 [0m[[0minfo[0m] [0mIncluding: commons-codec-1.9.jar[0m
 [0m[[0minfo[0m] [0mIncluding: slf4j-api-1.6.0.jar[0m
 [0m[[0minfo[0m] [0mIncluding: casbah-core_2.11-3.0.0.jar[0m
-[0m[[0minfo[0m] [0mIncluding: casbah-query_2.11-3.0.0.jar[0m
-[0m[[0minfo[0m] [0mIncluding: casbah-gridfs_2.11-3.0.0.jar[0m
 [0m[[0minfo[0m] [0mIncluding: config-1.3.0.jar[0m
+[0m[[0minfo[0m] [0mIncluding: casbah-query_2.11-3.0.0.jar[0m
+[0m[[0minfo[0m] [0mIncluding: joda-convert-1.2.jar[0m
+[0m[[0minfo[0m] [0mIncluding: casbah-gridfs_2.11-3.0.0.jar[0m
 [0m[[0minfo[0m] [0mIncluding: scala-java8-compat_2.11-0.7.0.jar[0m
 [0m[[0minfo[0m] [0mIncluding: akka-actor_2.11-2.4.2.jar[0m
 [0m[[0mdebug[0m] [0mCalculate mappings...[0m
@@ -40,7 +40,7 @@
 [0m[[33mwarn[0m] [0mMerging 'META-INF/maven/org.slf4j/slf4j-api/pom.xml' with strategy 'discard'[0m
 [0m[[33mwarn[0m] [0mStrategy 'discard' was applied to 16 files[0m
 [0m[[33mwarn[0m] [0mStrategy 'rename' was applied to 4 files[0m
-[0m[[0minfo[0m] [0mSHA-1: 59522f007e00827d342a2856a1bb332050656277[0m
+[0m[[0minfo[0m] [0mSHA-1: de7ee5e4ac6ed4a06d59551d5ce0990f7e610ef2[0m
 [0m[[0minfo[0m] [0mPackaging /home/heitor/sbt-projects/CheckLinks/target/scala-2.11/CheckLinks-assembly-1.0.jar ...[0m
 [0m[[0mdebug[0m] [0mInput file mappings:[0m
 [0m[[0mdebug[0m] [0m	META-INF/LICENSE_commons-codec-1.9.txt[0m
