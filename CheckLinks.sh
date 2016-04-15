@@ -23,9 +23,9 @@ echo
 echo "-----------------------------------------------------------------------"
 echo "CheckLinksApplication - checking $lines links"
 #sbt "run-main org.bireme.cl.CheckLinksApplication $1 $2 $3 $5"
-java -cp $CHECK_LINKS_HOME/target/scala-2.11/CheckLinks-assembly-1.0.jar org.bireme.cl.CheckLinksApplication $1 $2 $3 $5
+java -cp $CHECK_LINKS_HOME/CheckLinks.jar org.bireme.cl.CheckLinksApplication $1 $2 $3 $5
 
 echo
 echo "Checking if broken urls were broken some time ago ..."
 #sbt "run-main org.bireme.murl.MongoUrlApp mongodb.bireme.br $3 $4 $5"
-java -cp $CHECK_LINKS_HOME/target/scala-2.11/CheckLinks-assembly-1.0.jar org.bireme.murl.MongoUrlApp mongodb.bireme.br $3 $4 $5
+java -cp $CHECK_LINKS_HOME/CheckLinks.jar org.bireme.murl.MongoUrlApp mongodb.bireme.br $3 $4 $5
