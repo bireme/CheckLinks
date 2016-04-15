@@ -119,7 +119,9 @@ object CheckLinksApplication extends App {
   if (!append) new File(args(2)).delete()
 
   // Waiting miliseconds
-  Thread.sleep(waitMiliS * 60 * 1000)
+  val totWait = waitMiliS * 60 * 1000
+  println("\nWaiting " + totWait + " miliseconds before step 2")
+  Thread.sleep(totWait)
 
   // Second check - only broken links
   //val lkNum2 = Source.fromFile(broken).getLines.size
