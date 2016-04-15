@@ -96,11 +96,11 @@ object CheckLinksApplication extends App {
   System.setProperty("org.apache.commons.logging.simplelog.defaultlog", "error")
 
   var append = false
-  var waitMiliS = 0
+  var waitMinutes = 0
   var charset = StandardCharsets.UTF_8
   for (idx <- 3 until args.length) {
       if (args(idx).equals("--append")) append = true
-      else if (args(idx).startsWith("-wait=")) waitMiliS =
+      else if (args(idx).startsWith("-wait=")) waitMinutes =
                                         Integer.parseInt(args(idx).substring(6))
       else charset = Charset.forName(args(idx))
   }
@@ -118,10 +118,10 @@ object CheckLinksApplication extends App {
 
   if (!append) new File(args(2)).delete()
 
-  // Waiting miliseconds
-  val totWait = waitMiliS * 60 * 1000
-  println("\nWaiting " + totWait + " miliseconds before step 2")
-  Thread.sleep(totWait)
+  // Waiting seconds
+  val waitMiliseconds = waitMinutes * 60 * 1000
+  println("\nWaiting " + waitMinutes + " minutes before step 2")
+  Thread.sleep(waitMiliseconds)
 
   // Second check - only broken links
   //val lkNum2 = Source.fromFile(broken).getLines.size
