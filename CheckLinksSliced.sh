@@ -1,5 +1,8 @@
 #!/bin/bash
 
+JAVA_HOME=/usr/local/java8   # Chamada via ssh de outra maquina
+PATH=$JAVA_HOME/bin:$PATH
+
 if [ "$#" -lt 4 ]; then
   echo "usage: <inFile> <outGoodFile> <outBrokenFile> <outMongoBrokenFile> [<encoding>]"
   exit 1

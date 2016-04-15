@@ -1,4 +1,6 @@
 #!/bin/bash
+JAVA_HOME=/usr/local/java8   # Chamada via ssh de outra maquina
+PATH=$JAVA_HOME/bin:$PATH
 
 HOME=/home/javaapps/sbt-projects/CheckLinks
 SBT_DIR=/home/users/heitor.barbieri/bin
