@@ -50,7 +50,7 @@ case object AskByUrl
 object CheckLinksApplication extends App {
   def usage() : Unit = {
     Console.err.println("usage CheckLinksApplication <inFile> <outGoodFile> "
-                                   + " <outBrokenFile> [<encoding>] [--append]")
+          + " <outBrokenFile> [<encoding>] [-wait=<minutes>] [--append]")
     System.exit(1)
   }
 
@@ -96,9 +96,12 @@ object CheckLinksApplication extends App {
   System.setProperty("org.apache.commons.logging.simplelog.defaultlog", "error")
 
   var append = false
+  var waitMiliS = 0
   var charset = StandardCharsets.UTF_8
   for (idx <- 3 until args.length) {
       if (args(idx).equals("--append")) append = true
+      else if (args(idx).startsWith("-wait=")) waitMiliS =
+                                        Integer.parseInt(args(idx).substring(6))
       else charset = Charset.forName(args(idx))
   }
 
@@ -114,6 +117,9 @@ object CheckLinksApplication extends App {
   println("Step 1 - Check finished")
 
   if (!append) new File(args(2)).delete()
+
+  // Waiting miliseconds
+  Thread.sleep(waitMiliS * 60 * 1000)
 
   // Second check - only broken links
   //val lkNum2 = Source.fromFile(broken).getLines.size
