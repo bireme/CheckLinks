@@ -49,7 +49,7 @@ class CheckUrlActor(reader: ActorRef,
       case Some((src, id, url)) => {
         val errCode = CheckUrl.check(url, true)
         val out_url = src + "|" + id + "|" + url + "|" + errCode
-        ((errCode < 400), out_url)
+        (!CheckUrl.isBroken(errCode), out_url)
       }
       case None => (false, surl + "|invalid string parameter")
     }

@@ -82,7 +82,7 @@ object CheckLinksApplication extends App {
 
     //println("antes do Await...")
     //val result = Await.result(future, 10 seconds)
-    val result = Await.result(future, Duration(50, HOURS))
+    Await.result(future, Duration(50, HOURS))
 
     _system.terminate
   }

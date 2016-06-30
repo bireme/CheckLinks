@@ -9,3 +9,5 @@ libraryDependencies ++= Seq(
   "org.apache.httpcomponents" % "httpclient" % "4.5.1",
   "org.mongodb" %% "casbah" % "3.0.0"
 )
+
+addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.14")

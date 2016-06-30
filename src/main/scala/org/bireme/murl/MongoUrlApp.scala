@@ -25,8 +25,8 @@ package org.bireme.murl
 import com.mongodb.casbah.Imports._
 import java.io.File
 import java.nio.charset.Charset
-import java.nio.file._
-import scala.io._
+import java.nio.file.{Files, StandardOpenOption}
+import scala.io.Source
 
 /**
  * author: Heitor Barbieri
@@ -50,10 +50,12 @@ object MongoUrlApp extends App {
   val writer =
     Files.newBufferedWriter(new File(outFile).toPath(),
                             Charset.forName(charset), StandardOpenOption.CREATE)
-  val lines = Source.fromFile(inFile, charset).getLines()
+  val src = Source.fromFile(inFile, charset)
+  val lines = src.getLines()
 
   println("Saving urls into Mongodb collection")
   lines.foreach(line => if (mongo.addUrl(line)) writer.append(line + "\n"))
 
+  src.close()
   writer.close()
 }

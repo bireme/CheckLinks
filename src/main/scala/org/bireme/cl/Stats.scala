@@ -22,15 +22,8 @@
 
 package org.bireme.cl
 
-import java.io.File
-import java.nio.charset.{Charset,StandardCharsets}
-import java.nio.file.{Files, StandardOpenOption}
-import java.util.TreeMap
-import scala.collection.JavaConversions._
-import scala.collection.mutable._
-import scala.io._
-
-
+import scala.collection.immutable.{HashMap, TreeMap}
+import scala.io.Source
 
 /**
  * author: Heitor Barbieri
@@ -43,32 +36,32 @@ object Stats extends App {
   }
 
   def stats(infile: String,
-            charset: Charset): Unit = {
-    val map = HashMap.empty[String, Int]
+            encoding: String): Unit = {
     val regExp = " *\\| *".r
-    val lines = Source.fromFile(new File(infile))(charset).getLines()
+    val src = Source.fromFile(infile, encoding)
+    val lines = src.getLines()
 
-    for (line <- lines) {
-      val split = regExp.split(line)
-      if (split.length >= 4) {
-        val key = split(3)
-        map.get(key) match {
-          case Some(value) => map.put(key, value+1)
-          case None => map.put(key, 1)
-        }
+    val hmap = lines.foldLeft[Map[String,Int]](HashMap()) {
+      case (map, line) => {
+        val split = regExp.split(line)
+        if (split.length >= 4) {
+          val key = split(3)
+          val value = map.getOrElse(key, 0)
+          map + ((key, value + 1))
+        } else map
       }
     }
-    val tmap = new TreeMap[Int,String]()
-    for (x <- map) {
-      tmap.put(x._2,x._1)
+    src.close()
+
+    val tmap = hmap.foldLeft[Map[Int,String]](TreeMap()(Ordering[Int]
+                                                                    .reverse)) {
+      case (map,(k,v)) => map + ((v, k))
     }
-    for (y <- tmap.descendingMap()) {
-      println("[" + y._2 + "] => " + y._1)
-    }
+    tmap.foreach { case (k,v) => println("[" + v + "] => " + k)}
   }
 
   if (args.length < 1) usage()
-  val charset = if (args.length == 1) StandardCharsets.UTF_8
-                else  Charset.forName(args(1))
-  stats(args(0), charset)
+  val encoding = if (args.length == 1) "UTF-8" else args(1)
+
+  stats(args(0), encoding)
 }

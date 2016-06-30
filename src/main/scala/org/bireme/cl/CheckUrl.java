@@ -186,8 +186,8 @@ public class CheckUrl {
         }
         final boolean ret;
 
-        if ((code == 200) || (code == 401) ||
-            (code == 402) || (code == 407)) {
+        if ((code == 200) || (code == 401) || (code == 402) ||
+            (code == 403) || (code == 407)) {
             ret = false;
         } else {
             ret = true;

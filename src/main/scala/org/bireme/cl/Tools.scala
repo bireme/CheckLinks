@@ -22,11 +22,10 @@
 
 package org.bireme.cl
 
-import java.io._
+import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.{Files, StandardOpenOption}
-import scala.collection.mutable._
-import scala.io._
+import scala.io.Source
 
 /**
  * author: Heitor Barbieri
@@ -35,35 +34,17 @@ import scala.io._
 object Tools {
   def mergeFile(infile: String,
                 inoutfile: String,
-                charset: Charset): Unit = {
-    val lines = Source.fromFile(new File(infile))(charset).getLines()
-    val writer = Files.newBufferedWriter(new File(inoutfile).toPath(), charset,
+                encoding: String): Unit = {
+    val src = Source.fromFile(infile, encoding)
+    val lines = src.getLines()
+    val writer = Files.newBufferedWriter(new File(inoutfile).toPath(),
+                                         Charset.forName(encoding),
                                          StandardOpenOption.APPEND)
     for (line <- lines) {
       writer.append(line)
       writer.newLine()
     }
+    src.close()
     writer.close()
-  }
-
-  def stats(infile: String): Unit = {
-    val map = HashMap.empty[String, Int]
-    val regExp = " *\\| *".r
-    val lines = Source.fromFile(new File(infile)).getLines()
-
-    for (line <- lines) {
-      val split = regExp.split(line)
-      if (split.length >= 4) {
-        val key = split(3)
-        map.get(key) match {
-          case Some(value) => map.put(key, value+1)
-          case None => map.put(key, 1)
-        }
-      }
-    }
-
-    for (x <- map) {
-      println(x._1 + ": " + x._2)
-    }
   }
 }

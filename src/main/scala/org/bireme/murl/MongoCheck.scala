@@ -1,6 +1,6 @@
 /*=========================================================================
 
-    Copyright © 2015 BIREME/PAHO/WHO
+  65432qaCopyright © 2015 BIREME/PAHO/WHO
 
     This file is part of Check Links.
 
@@ -46,8 +46,7 @@ object MongoCheck extends App {
     }
   }
 
-  private def delNotBrokenDocument(col: MongoCollection,
-                                   doc: MongoDBObject) : Boolean = {
+  private def delNotBrokenDocument(doc: MongoDBObject) : Boolean = {
     if (isBrokenDocument(doc)) false
     else {
       coll.remove(doc)
@@ -71,7 +70,7 @@ object MongoCheck extends App {
   var totalRemoved = 0
 
   for (doc <- allDocs) {
-    if (delNotBrokenDocument(coll, doc)) totalRemoved += 1
+    if (delNotBrokenDocument(doc)) totalRemoved += 1
     curDoc += 1
     if (curDoc % 10 == 0) println("+++" + curDoc + " / " + totalRemoved)
     //println(doc)
