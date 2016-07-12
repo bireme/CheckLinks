@@ -36,7 +36,7 @@ class MongoUrl(host: String,
                maxDiffDays: Int = 60) {
 
   val mongoClient = MongoClient(host, port)
-  val db = mongoClient("CheckLinks")
+  val db = mongoClient("SocialCheckLinks")
   val coll = db("HistoryBrokenLinks")
   val today = new Date()
   val calendar = Calendar.getInstance()
