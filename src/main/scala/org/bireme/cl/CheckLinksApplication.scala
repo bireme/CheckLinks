@@ -96,7 +96,7 @@ object CheckLinksApplication extends App {
   System.setProperty("org.apache.commons.logging.simplelog.defaultlog", "error")
 
   var append = false
-  var waitMinutes = 0
+  var waitMinutes = 180
   var charset = StandardCharsets.UTF_8
   for (idx <- 3 until args.length) {
       if (args(idx).equals("--append")) append = true
