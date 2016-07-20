@@ -187,7 +187,9 @@ public class CheckUrl {
         final boolean ret;
 
         if ((code == 200) || (code == 401) || (code == 402) ||
-            (code == 403) || (code == 407)) {
+            (code == 403) || (code == 407) ||
+            // super quebra-galho nao sei como lidar com certificado de seguranca
+            (code == SSL_HANDSHAKE_EXCEPTION)) {
             ret = false;
         } else {
             ret = true;

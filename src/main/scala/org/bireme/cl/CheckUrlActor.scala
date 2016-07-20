@@ -41,7 +41,7 @@ class CheckUrlActor(reader: ActorRef,
       writer ! checkUrl(url)
       reader ! AskByUrl
     }
-    case Finish => () //println("CheckUrlActor finishing")
+    case Finish => () // println("CheckUrlActor finishing.")
   }
 
   def checkUrl(surl: String): (Boolean,String) = {
