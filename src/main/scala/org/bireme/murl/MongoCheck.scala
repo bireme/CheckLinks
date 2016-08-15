@@ -65,7 +65,7 @@ object MongoCheck extends App {
   val coll = db("BrokenLinks")
 
   println("urls=" + coll.count())
-  val allDocs = coll.find()
+  val allDocs = coll.find().toList
   var curDoc = 0
   var totalRemoved = 0
 
