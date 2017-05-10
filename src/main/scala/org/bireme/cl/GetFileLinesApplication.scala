@@ -36,13 +36,10 @@ object CheckFileLinesApplication extends App {
   }
 
   def showLines(gfl: GetFileLines): Unit = {
-      gfl.getLine() match {
-        case Some(line) => {
-          println(line)
-          showLines(gfl)
-        }
-        case None => ()
-      }
+    gfl.getLine().foreach { line =>
+      println(line)
+      showLines(gfl)
+    }      
   }
 
   if (args.length < 1) usage()

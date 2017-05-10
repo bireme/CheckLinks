@@ -76,11 +76,9 @@ class ReadUrlActor(file: File,
 
   def getPipedLine(): Option[String] = {
     try {
-      reader.getLine() match {
-        case Some(line) =>  if (line.isEmpty() || (line.charAt(0) == '#'))
-                                  getPipedLine()
-                            else Some(line)
-        case None => None
+      reader.getLine().flatMap { line =>
+        if (line.isEmpty() || (line.charAt(0) == '#')) getPipedLine()
+        else Some(line)
       }
     } catch {
       case ex: Exception => {

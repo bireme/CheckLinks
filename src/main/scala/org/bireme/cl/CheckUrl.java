@@ -90,7 +90,7 @@ public class CheckUrl {
             httpX.setHeader(new BasicHeader("User-Agent", "Wget/1.16.1 (linux-gnu)"));
             httpX.setHeader(new BasicHeader("Accept", "*/*"));
             httpX.setHeader(new BasicHeader("Accept-Encoding", "identity"));
-            httpX.setHeader(new BasicHeader("Connection", "Keep-Alive"));
+            //httpX.setHeader(new BasicHeader("Connection", "Keep-Alive"));
 
             // Create a custom response handler
             final ResponseHandler<Integer> responseHandler =

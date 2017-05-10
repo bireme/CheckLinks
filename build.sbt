@@ -2,12 +2,17 @@ name := "CheckLinks"
 
 version := "1.0"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.2"
+
+val akkaVersion = "2.4.18"
+val httpclientVersion = "4.5.3"
+val casbahVersion = "3.1.1"
+val hairyfotrVersion = "0.1.17"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor" % "2.4.2",
-  "org.apache.httpcomponents" % "httpclient" % "4.5.1",
-  "org.mongodb" %% "casbah" % "3.0.0"
+  "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+  "org.apache.httpcomponents" % "httpclient" % httpclientVersion,
+  "org.mongodb" %% "casbah" % casbahVersion
 )
 
-addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.14")
+addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % hairyfotrVersion)
