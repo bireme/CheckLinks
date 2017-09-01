@@ -24,8 +24,6 @@ package org.bireme.murl
 
 import org.bireme.cl.CheckUrl
 import com.mongodb.casbah.Imports._
-import java.io.File
-import scala.io._
 
 /**
  * Removes from SocialCheckLinks database / CheckUrl collection all

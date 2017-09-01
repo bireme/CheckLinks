@@ -22,7 +22,7 @@
 
 package org.bireme.cl
 
-import akka.actor.{ Actor, ActorRef, ActorSystem, Props, PoisonPill }
+import akka.actor.{ Actor, ActorRef, Props }
 import java.io.File
 import scala.io._
 

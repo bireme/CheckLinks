@@ -91,6 +91,7 @@ public class CheckUrl {
             httpX.setHeader(new BasicHeader("Accept", "*/*"));
             httpX.setHeader(new BasicHeader("Accept-Encoding", "identity"));
             //httpX.setHeader(new BasicHeader("Connection", "Keep-Alive"));
+            httpX.setHeader(new BasicHeader("Connection", "close"));
 
             // Create a custom response handler
             final ResponseHandler<Integer> responseHandler =

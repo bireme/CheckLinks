@@ -22,7 +22,6 @@
 
 package org.bireme.murl
 
-import com.mongodb.casbah.Imports._
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.{Files, StandardOpenOption}

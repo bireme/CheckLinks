@@ -27,7 +27,6 @@ import java.io.File
 import java.util.{Calendar, Date, GregorianCalendar}
 import java.nio.charset.Charset
 import java.nio.file.{Files, StandardOpenOption}
-import scala.io.Source
 
 /**
  * Export to a file all last twiced checked broken urls from MongoDb to a file.

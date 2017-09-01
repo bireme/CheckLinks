@@ -23,15 +23,13 @@
 package org.bireme.cl
 
 import java.io._
-import java.nio.charset.Charset
 
 /**
  *
  * author Heitor Barbieri
  * date 20151103
  */
-class GetFileLines0(file: File,
-                    charset: Charset) {
+class GetFileLines0(file: File) {
   val bis = new BufferedInputStream(new FileInputStream(file))
   var nextLine = getLine()
 

@@ -23,7 +23,6 @@
 package org.bireme.murl
 
 import com.mongodb.casbah.Imports._
-import java.text.SimpleDateFormat
 import java.util.{Calendar,Date}
 
 /**

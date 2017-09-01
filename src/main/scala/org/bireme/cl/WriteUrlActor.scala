@@ -22,12 +22,11 @@
 
 package org.bireme.cl
 
-import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import akka.actor.Actor
 
 import java.io._
 import java.nio.charset.Charset
 import java.nio.file.{Files,StandardOpenOption}
-import java.util.Date
 
 /**
  * author Heitor Barbieri
