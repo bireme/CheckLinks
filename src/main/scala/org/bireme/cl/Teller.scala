@@ -102,7 +102,7 @@ class Teller(tell: Int = 500) {
         medStr + " max:" + maxStr + " total:" + totStr + "\n[free mem] cur:" +
         free + "Mb min:" + minFree + "Mb med:" + medFree + "Mb max:" +
         maxFree + "Mb\n" +
-        "---------------------------------------------------------");
+        "---------------------------------------------------------")
 
       stepGood = 0
       stepBroken = 0

@@ -96,7 +96,7 @@ object CheckLinksApplication extends App {
   System.setProperty("org.apache.commons.logging.simplelog.defaultlog", "error")
 
   var append = false
-  var waitMinutes = 180
+  var waitMinutes = 30
   var charset = StandardCharsets.UTF_8
   for (idx <- 3 until args.length) {
       if (args(idx).equals("--append")) append = true
@@ -119,9 +119,9 @@ object CheckLinksApplication extends App {
 
   if (!append) new File(args(2)).delete()
 
-  // Waiting seconds
-  val waitMiliseconds = waitMinutes * 60 * 1000
-  println("\nWaiting " + waitMinutes + " minutes before step 2")
+  // Waiting 4 minutes
+  val waitMiliseconds = 4 * 60 * 1000
+  println("\nWaiting 4 minutes before step 2")
   Thread.sleep(waitMiliseconds)
 
   // Second check - only broken links
@@ -130,9 +130,9 @@ object CheckLinksApplication extends App {
   check(broken, args(1), broken2, charset, true, numOfCheckers)
   println("Step 2 - Check finished")
 
-  // Waiting seconds
-  val waitMiliseconds2 = 4 * 60 * 1000
-  println("\nWaiting " + waitMiliseconds2 + " minutes before step 3")
+  // Waiting 'waitMinutes' minutes
+  val waitMiliseconds2 = waitMinutes * 60 * 1000
+  println("\nWaiting " + waitMinutes + " minutes before step 3")
   Thread.sleep(waitMiliseconds2)
 
   // Second check - only broken links (one by one)

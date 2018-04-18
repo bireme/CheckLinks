@@ -32,13 +32,23 @@ import akka.actor.ActorRef
  */
 class CheckUrlActor(reader: ActorRef,
                     writer: ActorRef) extends Actor {
+  val sleepTime = 1 * 60 * 1000 // 1 minute
+  val maxBadUrls = 200
+  var numOfBadUrls = 0
 
   def receive: Receive = {
     case Start => {
       reader ! AskByUrl
     }
     case url: String => {
-      writer ! checkUrl(url)
+      val (isOk, curl) = checkUrl(url)
+      writer ! (isOk, curl)
+      if (!isOk) numOfBadUrls += 1
+      if (numOfBadUrls >= maxBadUrls) {
+        println("*")
+        Thread.sleep(sleepTime.toLong)
+        numOfBadUrls = 0
+      }
       reader ! AskByUrl
     }
     case Finish => () // println("CheckUrlActor finishing.")
