@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#CHECK_LINKS_HOME=/home/javaapps/sbt-projects/CheckLinks
-CHECK_LINKS_HOME=/home/heitor/sbt-projects/CheckLinks
+JAVA_HOME=/usr/local/java8   # Chamada via ssh de outra maquina
+PATH=$JAVA_HOME/bin:$PATH
+CHECK_LINKS_HOME=/home/javaapps/sbt-projects/CheckLinks
 
 if [ "$#" -lt 1 ]; then
   echo "usage: <url> [--allContent]"
