@@ -2,7 +2,7 @@ name := "CheckLinks"
 
 version := "1.0"
 
-scalaVersion := "2.12.5"
+scalaVersion := "2.12.6"
 
 val akkaVersion =  "2.5.12" // "2.5.4"
 val httpclientVersion = "4.5.5"
