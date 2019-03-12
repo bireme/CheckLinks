@@ -21,29 +21,27 @@ class ReadUrlActor(file: File,
                    writeUrl: ActorRef,
                    numberOfCheckers: Int) extends Actor {
   //val lines = Source.fromFile(file)(codec).getLines()
-  val reader = new GetFileLines(file, codec.charSet)
-  val children = createCheckers()
+  val reader: GetFileLines = new GetFileLines(file, codec.charSet)
+  val children: List[ActorRef] = createCheckers()
   var ref : ActorRef = _
-  var finished = 0
+  var finished: Int = 0
 
   def receive: Receive = {
-    case Start => {
+    case Start =>
       ref = sender()
-      children.map(child => child ! Start)
-    }
-    case AskByUrl => getPipedLine() match {
+      children.foreach(child => child ! Start)
+
+    case AskByUrl => getPipedLine match {
       case Some(line) => sender ! line
-      case None => {
+      case None =>
         sender ! Finish
         finished += 1
         if (finished == numberOfCheckers) writeUrl ! Finish
-      }
     }
-    case Finish => {
+    case Finish =>
       //println("ReadUrlActor is finishing")
       reader.close()
       ref ! Finish   // Advise CheckLinksApplication to finish
-    }
   }
 
   def createCheckers() : List[ActorRef] = {
@@ -59,22 +57,21 @@ class ReadUrlActor(file: File,
     create(List.empty[ActorRef], 0)
   }
 
-  def getPipedLine(): Option[String] = {
+  def getPipedLine: Option[String] = {
     try {
-      reader.getLine().flatMap { line =>
-        if (line.isEmpty() || (line.charAt(0) == '#')) getPipedLine()
+      reader.getLine.flatMap { line =>
+        if (line.isEmpty || (line.charAt(0) == '#')) getPipedLine
         else Some(line)
       }
     } catch {
-      case ex: Exception => {
-        println("[ERROR] bad input line => " + ex.toString())
+      case ex: Exception =>
+        println("[ERROR] bad input line => " + ex.toString)
         //ex.printStackTrace()
         //getPipedLine()
         None
-      }
     }
   }
 
-  def killCheckers() = {
+  def killCheckers(): Unit = {
   }
 }

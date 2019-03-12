@@ -27,17 +27,15 @@ object MongoLastBrokenApp extends App {
 
   def getLastUpdated(coll: MongoCollection): Date = {
     val max: Any = coll.distinct("updated").reduce[Any] {
-      case (e1,e2) => {
+      case (e1,e2) =>
         e1 match {
-          case d1:Date => {
+          case d1:Date =>
             e2 match {
               case d2:Date => if (d1 after d2) d1 else d2
               case _ => throw new ClassCastException
             }
-          }
           case _ => throw new ClassCastException
         }
-      }
     }
     max.asInstanceOf[Date]
   }
@@ -51,7 +49,7 @@ object MongoLastBrokenApp extends App {
     calendar.set(Calendar.MINUTE, 0)
     calendar.set(Calendar.SECOND, 0)
 
-    val date2:Date = calendar.getTime()
+    val date2:Date = calendar.getTime
     val gte = MongoDBObject("$gte" -> date2)
     val query = MongoDBObject("mst" -> mst,
                               "updated" -> gte)
@@ -66,7 +64,7 @@ object MongoLastBrokenApp extends App {
   val outFile = args(2) //"testeout.txt"
   val charset = if (args.length > 3) args(3) else "UTF-8"
   val writer =
-    Files.newBufferedWriter(new File(outFile).toPath(),
+    Files.newBufferedWriter(new File(outFile).toPath,
                             Charset.forName(charset),
                             StandardOpenOption.CREATE,
                             StandardOpenOption.TRUNCATE_EXISTING)

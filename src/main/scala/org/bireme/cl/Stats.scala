@@ -27,14 +27,13 @@ object Stats extends App {
     val lines = src.getLines()
 
     val hmap = lines.foldLeft[Map[String,Int]](HashMap()) {
-      case (map, line) => {
+      case (map, line) =>
         val split = regExp.split(line)
         if (split.length >= 4) {
           val key = split(3)
           val value = map.getOrElse(key, 0)
           map + ((key, value + 1))
         } else map
-      }
     }
     src.close()
 

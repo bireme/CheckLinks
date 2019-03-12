@@ -22,7 +22,7 @@ object Tools {
                 encoding: String): Unit = {
     val src = Source.fromFile(infile, encoding)
     val lines = src.getLines()
-    val writer = Files.newBufferedWriter(new File(inoutfile).toPath(),
+    val writer = Files.newBufferedWriter(new File(inoutfile).toPath,
                                          Charset.forName(encoding),
                                          StandardOpenOption.APPEND)
     for (line <- lines) {

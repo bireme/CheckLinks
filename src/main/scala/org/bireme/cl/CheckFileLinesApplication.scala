@@ -21,7 +21,7 @@ object CheckFileLinesApplication extends App {
   }
 
   def showLines(gfl: GetFileLines): Unit = {
-    gfl.getLine().foreach { line =>
+    gfl.getLine.foreach { line =>
       println(line)
       showLines(gfl)
     }

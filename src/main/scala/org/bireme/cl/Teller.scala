@@ -15,22 +15,22 @@ import java.util.Date
  * date 20151111
  */
 class Teller(tell: Int = 500) {
-    val second = 1000
-    val minute = 60 * second
-    val hour = 60 * minute
-    val day = 24 * hour
+    val second: Int = 1000
+    val minute: Int = 60 * second
+    val hour: Int = 60 * minute
+    val day: Int = 24 * hour
 
-    var cur = 0
-    var good = 0
-    var broken = 0
-    var stepGood = 0
-    var stepBroken = 0
-    var startDate = new Date()
-    var lastDate = startDate
-    var minDiff = 0L
-    var maxDiff = 0L
-    var minFree = Runtime.getRuntime().freeMemory() / (1024 * 1024)
-    var maxFree = minFree
+    var cur: Int = 0
+    var good: Int = 0
+    var broken: Int = 0
+    var stepGood: Int = 0
+    var stepBroken: Int = 0
+    var startDate: Date = new Date()
+    var lastDate: Date = startDate
+    var minDiff: Long = 0L
+    var maxDiff: Long = 0L
+    var minFree: Long = Runtime.getRuntime.freeMemory / (1024 * 1024)
+    var maxFree: Long = minFree
 
     def start() : Unit = {
       cur = 0
@@ -42,7 +42,7 @@ class Teller(tell: Int = 500) {
       lastDate = startDate
       minDiff = 0L
       maxDiff = 0L
-      minFree = Runtime.getRuntime().freeMemory() / (1024 * 1024)
+      minFree = Runtime.getRuntime.freeMemory() / (1024 * 1024)
       maxFree = minFree
     }
 
@@ -60,11 +60,11 @@ class Teller(tell: Int = 500) {
 
     def printCurrent() : Unit = {
       val curDate = new Date()
-      val fmtCurDate = new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(curDate);
-      val curTime = curDate.getTime()
-      val totDiff = curTime - startDate.getTime()
+      val fmtCurDate = new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(curDate)
+      val curTime = curDate.getTime
+      val totDiff = curTime - startDate.getTime
       val medDiff = (totDiff.toFloat / cur * tell).toLong
-      val curDiff = curTime - lastDate.getTime()
+      val curDiff = curTime - lastDate.getTime
       if ((minDiff == 0) || (curDiff < minDiff))  minDiff = curDiff
       if (curDiff > maxDiff) maxDiff = curDiff
 
@@ -73,7 +73,7 @@ class Teller(tell: Int = 500) {
       val maxStr = getTimeStr(maxDiff)
       val medStr = getTimeStr(medDiff)
       val totStr = getTimeStr(totDiff)
-      val free =  Runtime.getRuntime().freeMemory() / (1024 * 1024)
+      val free =  Runtime.getRuntime.freeMemory() / (1024 * 1024)
       val medFree = (maxFree - minFree) / 2
       if (free < minFree) minFree = free
       if (free > maxFree) maxFree = free

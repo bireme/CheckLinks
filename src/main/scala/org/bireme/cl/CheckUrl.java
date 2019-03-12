@@ -6,7 +6,7 @@
   ==========================================================================*/
 package org.bireme.cl;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.net.*;
 import javax.net.ssl.*;
 import org.apache.http.*;
@@ -45,6 +45,7 @@ public class CheckUrl {
     public static final int SSL_HANDSHAKE_EXCEPTION = 1013;
     public static final int SSL_UNVERIFIED_PEER_EXCEPTION = 1014;
     public static final int NO_HTTP_RESPONSE_EXCEPTION = 1015;
+    public static final int FILE_NOT_FOUND_EXCEPTION = 1016;
 
     public static final int UNKNOWN = 1100;
 
@@ -61,44 +62,59 @@ public class CheckUrl {
         if (url == null) {
             throw new NullPointerException();
         }
+        final String urlT = url.trim();
+        final int retCode;
 
-        final CloseableHttpClient httpclient = HttpClients.createDefault();
-        int responseCode = -1;
+        if (urlT.startsWith("ftp:")) {
+            retCode = checkFtpUrl(urlT);
+        } else {
+            final CloseableHttpClient httpclient = HttpClients.createDefault();
+            int responseCode;
 
-        try {
-            final HttpRequestBase httpX = checkOnlyHeader ? new HttpHead(fixUrl(url))
-                                                  : new HttpGet(fixUrl(url));
-            //final HttpHead httpX = new HttpHead(fixUrl(url)); // Some servers return 500
-            //final HttpGet httpX = new HttpGet(fixUrl(url));
-            httpX.setConfig(CONFIG);
-            httpX.setHeader(new BasicHeader("User-Agent", "Wget/1.16.1 (linux-gnu)"));
-            httpX.setHeader(new BasicHeader("Accept", "*/*"));
-            httpX.setHeader(new BasicHeader("Accept-Encoding", "identity"));
-            //httpX.setHeader(new BasicHeader("Connection", "Keep-Alive"));
-            httpX.setHeader(new BasicHeader("Connection", "close"));
+            try {
+                final HttpRequestBase httpX = checkOnlyHeader ? new HttpHead(fixUrl(urlT))
+                        : new HttpGet(fixUrl(urlT));
+                //final HttpHead httpX = new HttpHead(fixUrl(url)); // Some servers return 500
+                //final HttpGet httpX = new HttpGet(fixUrl(url));
+                httpX.setConfig(CONFIG);
+                httpX.setHeader(new BasicHeader("User-Agent", "Wget/1.16.1 (linux-gnu)"));
+                httpX.setHeader(new BasicHeader("Accept", "*/*"));
+                httpX.setHeader(new BasicHeader("Accept-Encoding", "identity"));
+                //httpX.setHeader(new BasicHeader("Connection", "Keep-Alive"));
+                httpX.setHeader(new BasicHeader("Connection", "close"));
 
-            // Create a custom response handler
-            final ResponseHandler<Integer> responseHandler =
-                                               new ResponseHandler<Integer>() {
+                // Create a custom response handler
+                final ResponseHandler<Integer> responseHandler =
+                        new ResponseHandler<Integer>() {
 
-                @Override
-                public Integer handleResponse(final HttpResponse response)
-                                  throws ClientProtocolException, IOException {
-                    return response.getStatusLine().getStatusCode();
+                            @Override
+                            public Integer handleResponse(final HttpResponse response) {
+                                return response.getStatusLine().getStatusCode();
+                            }
+                        };
+                responseCode = httpclient.execute(httpX, responseHandler);
+            } catch (Exception ex) {
+                responseCode = getExceptionCode(ex);
+            } finally {
+                try {
+                    httpclient.close();
+                } catch (Exception ioe) {
+                    System.err.println(ioe.getMessage());
                 }
-            };
-            responseCode = httpclient.execute(httpX, responseHandler);
-        } catch (Exception ex) {
-            responseCode = getExceptionCode(ex);
-        } finally {
-        	try {
-        		httpclient.close();
-        	} catch (Exception ioe) {
-            System.err.println(ioe.getMessage());
-        	}
+            }
+            retCode =  (((responseCode == 403) || (responseCode == 500)) && checkOnlyHeader)
+                    ? check(urlT, false) : responseCode;
         }
-        return (((responseCode == 403)||(responseCode == 500)) && checkOnlyHeader)
-                                            ? check(url, false) : responseCode;
+        return retCode;
+    }
+
+    private static int checkFtpUrl(final String url) {
+        try {
+            new URL(url).openStream().close();
+            return 200;
+        } catch (Exception ex) {
+            return getExceptionCode(ex);
+        }
     }
 
     private static int getExceptionCode(final Exception ex) {
@@ -106,18 +122,18 @@ public class CheckUrl {
 
         final int code;
 
-        if (ex instanceof ClientProtocolException) {
+        if (ex instanceof HttpResponseException) {
+            code = ((HttpResponseException) ex).getStatusCode();
+        } else if (ex instanceof ClientProtocolException) {
         	code = CLIENT_PROTOCOL_EXCEPTION;
         } else if (ex instanceof ConnectionPoolTimeoutException) {
         	code = CONNECTION_POOL_TIMEOUT_EXCEPTION;
         } else if (ex instanceof ConnectionClosedException) {
-          code = CONNECTION_CLOSED_EXCEPTION;
+            code = CONNECTION_CLOSED_EXCEPTION;
         } else if (ex instanceof ConnectTimeoutException) {
         	code = CONNECT_TIMEOUT_EXCEPTION;
         } else if (ex instanceof HttpHostConnectException) {
         	code = HTTP_HOST_CONNECT_EXCEPTION;
-        } else if (ex instanceof HttpResponseException) {
-        	code = ((HttpResponseException)ex).getStatusCode();
         } else if (ex instanceof RequestAbortedException) {
         	code = REQUEST_ABORTED_EXCEPTION;
         } else if (ex instanceof UnsupportedSchemeException) {
@@ -148,7 +164,9 @@ public class CheckUrl {
         } else if (ex instanceof SSLPeerUnverifiedException) {
           code = SSL_UNVERIFIED_PEER_EXCEPTION;
         } else if (ex instanceof NoHttpResponseException) {
-          code = NO_HTTP_RESPONSE_EXCEPTION;
+            code = NO_HTTP_RESPONSE_EXCEPTION;
+        } else if (ex instanceof FileNotFoundException) {
+            code = FILE_NOT_FOUND_EXCEPTION;
         } else {
           final String msg = ex.getMessage();
           final String lmsg = (msg == null) ? "" : msg.toLowerCase();
@@ -171,14 +189,10 @@ public class CheckUrl {
         }
         final boolean ret;
 
-        if ((code == 200) || (code == 401) || (code == 402) ||
-            (code == 403) || (code == 407) ||
-            // super quebra-galho nao sei como lidar com certificado de seguranca
-            (code == SSL_HANDSHAKE_EXCEPTION)) {
-            ret = false;
-        } else {
-            ret = true;
-        }
+        ret = (code != 200) && (code != 401) && (code != 402) &&
+              (code != 403) && (code != 407) &&
+              // super quebra-galho nao sei como lidar com certificado de seguranca
+              (code != SSL_HANDSHAKE_EXCEPTION);
 
         return ret;
     }
@@ -188,7 +202,7 @@ public class CheckUrl {
         System.exit(-1);
     }
 
-    public static void main(final String[] args) throws IOException {
+    public static void main(final String[] args) {
         if (args.length < 1) {
              usage();
         }

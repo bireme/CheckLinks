@@ -19,20 +19,20 @@ class MongoUrl(host: String,
                minDiffDays: Int = 7,
                maxDiffDays: Int = 60) {
 
-  val mongoClient = MongoClient(host, port)
-  val db = mongoClient("SocialCheckLinks")
-  val coll = db("HistoryBrokenLinks")
-  val today = new Date()
-  val calendar = Calendar.getInstance()
-  val min = {
+  val mongoClient: MongoClient = MongoClient(host, port)
+  val db: MongoDB = mongoClient("SocialCheckLinks")
+  val coll: MongoCollection = db("HistoryBrokenLinks")
+  val today: Date = new Date()
+  val calendar: Calendar = Calendar.getInstance()
+  val min: Date = {
     calendar.setTime(today)
     calendar.add(Calendar.DAY_OF_YEAR, -minDiffDays)
-    calendar.getTime()
+    calendar.getTime
   }
-  val max = {
+  val max: Date = {
     calendar.setTime(today)
     calendar.add(Calendar.DAY_OF_YEAR, -maxDiffDays)
-    calendar.getTime()
+    calendar.getTime
   }
 
   def addUrl(line: String): Boolean = {
@@ -46,22 +46,19 @@ class MongoUrl(host: String,
                                "errCode" -> split(3).toInt)
 
       coll.findOne(MongoDBObject("_id" -> _id)) match {
-        case None => {
+        case None =>
           val doc = MongoDBObject("_id" -> _id, "broken" -> MongoDBList(elem))
           coll.insert(doc)
           false
-        }
-        case Some(doc: BasicDBObject) => {
+        case Some(doc: BasicDBObject) =>
           val broken =
                   doc.getAsOrElse[MongoDBList]("broken", MongoDBList()) += elem
           coll.update(MongoDBObject("_id" -> _id),
                                              MongoDBObject("broken" -> broken))
           twiceChecked(broken)
-        }
-        case other => {
+        case other =>
           println("ERROR: found unexpected case class " + other.getClass)
           false
-        }
       }
     } else {
       println("ERROR: invalid line format - " + line)
@@ -73,15 +70,14 @@ class MongoUrl(host: String,
     if (broken.size < 2) false
     else {
       broken.last match {
-        case doc: BasicDBObject => {
+        case doc: BasicDBObject =>
           doc.getOrElse("date", today) match {
             /*case lastDate: Date => (lastDate.after(max)) &&
                                    (lastDate.before(min))*/
-            case lastDate: Date => (lastDate.after(max)) &&
+            case lastDate: Date => lastDate.after(max) &&
                                                 (lastDate.compareTo(min) <= 0)
 
           }
-        }
       }
     }
   }

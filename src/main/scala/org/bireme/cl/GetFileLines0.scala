@@ -15,10 +15,10 @@ import java.io._
  * date 20151103
  */
 class GetFileLines0(file: File) {
-  val bis = new BufferedInputStream(new FileInputStream(file))
-  var nextLine = getLine()
+  val bis: BufferedInputStream = new BufferedInputStream(new FileInputStream(file))
+  var nextLine: Option[String] = getLine
 
-  def hasNext() : Boolean = {
+  def hasNext: Boolean = {
     nextLine match {
       case Some(_) => true
       case None => false
@@ -28,20 +28,19 @@ class GetFileLines0(file: File) {
   def next() : Option[String] = {
     if (hasNext) {
       val next = nextLine
-      nextLine = getLine()
+      nextLine = getLine
       next
     } else None
   }
 
-  def getLine(): Option[String] = {
+  def getLine: Option[String] = {
     def getLine0(builder: StringBuilder): Option[String] = {
       bis.read() match {
-        case i if (i == -1) => {
-          bis.close();
-          if (builder.length == 0) None else Some(builder.toString())
-        }  // end of file
-        case i if (i == 10) => Some(builder.toString())  // end of line
-        case i if (i > Character.MAX_VALUE) => getLine0(builder.append('?'))
+        case i if i == -1 =>
+          bis.close()
+          if (builder.isEmpty) None else Some(builder.toString())  // end of file
+        case i if i == 10 => Some(builder.toString())  // end of line
+        case i if i > Character.MAX_VALUE => getLine0(builder.append('?'))
         case i => getLine0(builder.append(i.toChar))             // typical char
       }
     }

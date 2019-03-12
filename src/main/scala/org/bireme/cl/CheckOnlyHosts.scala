@@ -49,13 +49,13 @@ object CheckOnlyHosts extends App {
     val lines = src.getLines()
 
     val hmap = lines.foldLeft[Map[String,Int]](TreeMap()) {
-      case (map, line) => {
+      case (map, line) =>
         val split = regExp.split(line)
         if (split.length >= 3) {
           try {
             val url = new URL(split(2))
-            val port = url.getPort()
-            val key = url.getProtocol() + "://" + url.getHost() +
+            val port = url.getPort
+            val key = url.getProtocol + "://" + url.getHost +
                     (if ((port == 80) || (port == -1)) "" else ":" + port)
             val value = map.getOrElse(key, 0)
             map + ((key, value + 1))
@@ -68,7 +68,6 @@ object CheckOnlyHosts extends App {
           println("ignoring url:" + line)
           map
         }
-      }
     }
     src.close()
     hmap

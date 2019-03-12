@@ -22,18 +22,18 @@ class WriteUrlActor(goodUrlFile: File,
                     brokenUrlFile: File,
                     charset: Charset,
                     append: Boolean = false) extends Actor {
-  val option = if (append) StandardOpenOption.APPEND
+  val option: StandardOpenOption = if (append) StandardOpenOption.APPEND
                else StandardOpenOption.TRUNCATE_EXISTING
-  val goodWriter = Files.newBufferedWriter(goodUrlFile.toPath(), charset,
+  val goodWriter: BufferedWriter = Files.newBufferedWriter(goodUrlFile.toPath, charset,
                     StandardOpenOption.CREATE,StandardOpenOption.WRITE, option)
-  val brokenWriter = Files.newBufferedWriter(brokenUrlFile.toPath(), charset,
+  val brokenWriter: BufferedWriter = Files.newBufferedWriter(brokenUrlFile.toPath, charset,
                     StandardOpenOption.CREATE,StandardOpenOption.WRITE, option)
-  val teller = new Teller()
+  val teller: Teller = new Teller()
 
   teller.start()
 
   def receive: Receive = {
-    case (isGood:Boolean,url:String) => {
+    case (isGood:Boolean,url:String) =>
       if (isGood) {
         goodWriter.write(url)
         goodWriter.newLine()
@@ -42,13 +42,11 @@ class WriteUrlActor(goodUrlFile: File,
         brokenWriter.newLine()
       }
       teller.add(isGood)
-    }
-    case Finish => {
+    case Finish =>
       goodWriter.close()
       brokenWriter.close()
       context.actorSelection("../readUrl") ! Finish
       //println("WriteUrlActor is finishing")
       // finish itself
-    }
   }
 }

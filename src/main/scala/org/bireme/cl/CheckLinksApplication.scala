@@ -61,7 +61,7 @@ object CheckLinksApplication extends App {
                               writeUrl, numberOfCheckers)), name = "readUrl")
 
     //implicit val timeout = Timeout(10 seconds)
-    implicit val timeout = Timeout(Duration(50, HOURS))
+    implicit val timeout: Timeout = Timeout(Duration(50, HOURS))
 
     val future = readUrl ? Start
 
@@ -112,7 +112,7 @@ object CheckLinksApplication extends App {
   // Second check - only broken links
   //val lkNum2 = Source.fromFile(broken).getLines.size
   println("\nStep 2 - Rechecking broken links")
-  check(broken, args(1), broken2, charset, true, numOfCheckers)
+  check(broken, args(1), broken2, charset, append = true, numOfCheckers)
   println("Step 2 - Check finished")
 
   // Waiting 'waitMinutes' minutes
@@ -123,7 +123,7 @@ object CheckLinksApplication extends App {
   // Second check - only broken links (one by one)
   //val lkNum2 = Source.fromFile(broken).getLines.size
   println("\nStep 3 - Rechecking broken links (one by one)")
-  check(broken2, args(1), args(2), charset, true, 1)
+  check(broken2, args(1), args(2), charset, append = true, 1)
   println("Step 3 - Check finished")
 
   // Delete temporary files

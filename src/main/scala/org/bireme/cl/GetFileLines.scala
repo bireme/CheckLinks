@@ -18,39 +18,33 @@ import java.nio.charset.Charset
  */
 class GetFileLines(file: File,
                    charset: Charset) {
-  val bis = new BufferedInputStream(new FileInputStream(file))
-  val buffer = ByteBuffer.allocate(1024)
+  val bis: BufferedInputStream = new BufferedInputStream(new FileInputStream(file))
+  val buffer: ByteBuffer = ByteBuffer.allocate(1024)
 
-  def getLine(): Option[String] = {
-    def getLine0(): Option[String] = {
-      bis.read() match {
-        case i if (i == -1) => { // end of file
-          if (buffer.position() == 0) None
-          else {
-            buffer.flip()
-            Some(charset.decode(buffer).toString())
-          }
+  def getLine: Option[String] = {
+    def getLine0: Option[String] = bis.read match {
+      case i if i == -1 => // end of file
+        if (buffer.position() == 0) None
+        else {
+          buffer.flip()
+          Some(charset.decode(buffer).toString)
         }
-        case i if ((i == 10) || (i == 13)) => { // end of line or carriage return
-          if (buffer.position() == 0) getLine0()
-          else {
-            buffer.flip()
-            Some(charset.decode(buffer).toString())
-          }
+      case i if (i == 10) || (i == 13) =>  // end of line or carriage return
+        if (buffer.position() == 0) getLine0
+        else {
+          buffer.flip()
+          Some(charset.decode(buffer).toString)
         }
-        case i if (i > Character.MAX_VALUE) => { // invalid char
-          buffer.put('?'.toByte)
-          getLine0()
-        }
-        case i => { // typical char
-          buffer.put(i.toByte)
-          getLine0()
-        }
-      }
+      case i if i > Character.MAX_VALUE => // invalid char
+        buffer.put('?'.toByte)
+        getLine0
+      case i => // typical char
+        buffer.put(i.toByte)
+        getLine0
     }
 
     buffer.clear()
-    getLine0()
+    getLine0
   }
 
   def close(): Unit = bis.close()

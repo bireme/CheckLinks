@@ -32,7 +32,7 @@ object MongoUrlApp extends App {
 
   val mongo = new MongoUrl(host, minDiffDays=0)
   val writer =
-    Files.newBufferedWriter(new File(outFile).toPath(),
+    Files.newBufferedWriter(new File(outFile).toPath,
                             Charset.forName(charset), StandardOpenOption.CREATE)
   val src = Source.fromFile(inFile, charset)
   val lines = src.getLines()

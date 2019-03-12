@@ -17,15 +17,14 @@ import akka.actor.ActorRef
  */
 class CheckUrlActor(reader: ActorRef,
                     writer: ActorRef) extends Actor {
-  val sleepTime = 1 * 60 * 1000 // 1 minute
-  val maxBadUrls = 200
-  var numOfBadUrls = 0
+  val sleepTime: Int = 1 * 60 * 1000 // 1 minute
+  val maxBadUrls: Int = 200
+  var numOfBadUrls: Int = 0
 
   def receive: Receive = {
-    case Start => {
+    case Start =>
       reader ! AskByUrl
-    }
-    case url: String => {
+    case url: String =>
       val (isOk, curl) = checkUrl(url)
       writer ! (isOk, curl)
       if (!isOk) numOfBadUrls += 1
@@ -35,17 +34,15 @@ class CheckUrlActor(reader: ActorRef,
         numOfBadUrls = 0
       }
       reader ! AskByUrl
-    }
     case Finish => () // println("CheckUrlActor finishing.")
   }
 
   def checkUrl(surl: String): (Boolean,String) = {
     parseUrl(surl) match {
-      case Some((src, id, url)) => {
+      case Some((src, id, url)) =>
         val errCode = CheckUrl.check(url, true)
         val out_url = src + "|" + id + "|" + url + "|" + errCode
         (!CheckUrl.isBroken(errCode), out_url)
-      }
       case None => (false, surl + "|invalid string parameter")
     }
   }
