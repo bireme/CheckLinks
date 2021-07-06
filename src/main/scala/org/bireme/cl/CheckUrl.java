@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.net.*;
 import javax.net.ssl.*;
 import org.apache.http.*;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.conn.*;
 import org.apache.http.client.*;
 import org.apache.http.client.config.RequestConfig;
@@ -55,6 +56,7 @@ public class CheckUrl {
                                            .setConnectTimeout(CONNECT_TIMEOUT)
                                            .setMaxRedirects(MAX_REDIRECTS)
                                            .setSocketTimeout(SO_TIMEOUT)
+                                           .setCookieSpec(CookieSpecs.STANDARD)
                                            .build();
 
     public static int check(final String url,
@@ -70,6 +72,7 @@ public class CheckUrl {
         } else {
             final CloseableHttpClient httpclient = HttpClients.createDefault();
             int responseCode;
+            String location = null;
 
             try {
                 final HttpRequestBase httpX = checkOnlyHeader ? new HttpHead(fixUrl(urlT))
@@ -84,16 +87,11 @@ public class CheckUrl {
                 httpX.setHeader(new BasicHeader("Connection", "close"));
 
                 // Create a custom response handler
-                final ResponseHandler<Integer> responseHandler =
-                        new ResponseHandler<Integer>() {
-
-                            @Override
-                            public Integer handleResponse(final HttpResponse response) {
-                                return response.getStatusLine().getStatusCode();
-                            }
-                        };
+                final MyResponseHandler responseHandler = new MyResponseHandler();
                 responseCode = httpclient.execute(httpX, responseHandler);
+                location = responseHandler.handleLocation();
             } catch (Exception ex) {
+                ex.printStackTrace();
                 responseCode = getExceptionCode(ex);
             } finally {
                 try {
@@ -102,10 +100,42 @@ public class CheckUrl {
                     System.err.println(ioe.getMessage());
                 }
             }
-            retCode =  (((responseCode == 403) || (responseCode == 500)) && checkOnlyHeader)
-                    ? check(urlT, false) : responseCode;
+
+            if (((responseCode == 403) || (responseCode == 500)) && checkOnlyHeader) {
+                retCode = check(urlT, false);
+            } else if ((responseCode == 301) || (responseCode == 308)) {
+                if (location == null) {
+                    retCode = 500;
+                } else {
+                    retCode = followRedirects(url, location, checkOnlyHeader);
+                }
+            } else {
+                retCode = responseCode;
+            }
         }
         return retCode;
+    }
+
+    private static int followRedirects(final String urls,
+                                       final String location,
+                                       final boolean checkOnlyHeader) {
+        String newUrl;
+        if (location.startsWith("http")) newUrl = location;
+        else {
+            try {
+                final URL url = new URL(urls);
+                final String protocol = url.getProtocol();
+                final String host = url.getHost();
+                final int port = url.getPort();
+                final String location2 = (location.charAt(0) == '/') ? location : "/" + location;
+
+                newUrl = protocol + "://" + host + ":" + port + location2;
+            } catch (Exception ex) {
+                newUrl = null;
+            }
+        }
+        if (newUrl == null) return 500;
+        else return check(newUrl, checkOnlyHeader);
     }
 
     private static int checkFtpUrl(final String url) {

@@ -49,21 +49,21 @@ object CheckLinksApplication extends App {
                                      ConfigFactory.load("application"))
 
     // Create actor that will write checked urls into output files
-    val writeUrl = _system.actorOf(Props(new WriteUrlActor(
-                              new File(outGoodFile),
-                              new File(outBrokenFile),
-                              charset, append)), name = "writeUrl")
+    val writeUrl: ActorRef = _system.actorOf(Props(new WriteUrlActor(
+                                             new File(outGoodFile),
+                                             new File(outBrokenFile),
+                                             charset, append)), name = "writeUrl")
 
     // Create actor that will read urls to be checked from input file
-    val readUrl = _system.actorOf(Props(new ReadUrlActor(
-                              new File(inFile),
-                              charset,
-                              writeUrl, numberOfCheckers)), name = "readUrl")
+    val readUrl: ActorRef = _system.actorOf(Props(new ReadUrlActor(
+                                            new File(inFile),
+                                            charset,
+                                            writeUrl, numberOfCheckers)), name = "readUrl")
 
     //implicit val timeout = Timeout(10 seconds)
     implicit val timeout: Timeout = Timeout(Duration(50, HOURS))
 
-    val future = readUrl ? Start
+    val future: Future[Any] = readUrl ? Start
 
     //println("antes do Await...")
     //val result = Await.result(future, 10 seconds)
@@ -90,7 +90,7 @@ object CheckLinksApplication extends App {
       else charset = Charset.forName(args(idx))
   }
 
-  val numOfCheckers = 25    // Max number of actors
+  val numOfCheckers = 100 /*25*/    // Max number of actors
   val broken = "broken.tmp" // Temporary file of broken links
   val broken2 = "broken2.tmp" // Temporary file of broken links
   val startDate = new Date()

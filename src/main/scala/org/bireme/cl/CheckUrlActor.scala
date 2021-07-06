@@ -20,6 +20,7 @@ class CheckUrlActor(reader: ActorRef,
   val sleepTime: Int = 1 * 60 * 1000 // 1 minute
   val maxBadUrls: Int = 200
   var numOfBadUrls: Int = 0
+  val clCore = new CheckLinksCore()
 
   def receive: Receive = {
     case Start =>
@@ -40,8 +41,11 @@ class CheckUrlActor(reader: ActorRef,
   def checkUrl(surl: String): (Boolean,String) = {
     parseUrl(surl) match {
       case Some((src, id, url)) =>
-        val errCode = CheckUrl.check(url, true)
+//println(s">>>$url")
+        val errCode = clCore.checkUrl(url)
+        //val errCode = CheckUrl.check(url, true)
         val out_url = src + "|" + id + "|" + url + "|" + errCode
+//println(out_url)
         (!CheckUrl.isBroken(errCode), out_url)
       case None => (false, surl + "|invalid string parameter")
     }
