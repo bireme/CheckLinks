@@ -44,7 +44,8 @@ object CheckLinksApplication extends App {
             outBrokenFile: String,
             charset: Charset,
             append: Boolean,
-            numberOfCheckers: Int = numOfCheckers) : Unit = {
+            numberOfCheckers: Int = numOfCheckers,
+            tell: Int = 500) : Unit = {
     val _system = ActorSystem.create("CheckLinksApp",
                                      ConfigFactory.load("application"))
 
@@ -52,7 +53,7 @@ object CheckLinksApplication extends App {
     val writeUrl: ActorRef = _system.actorOf(Props(new WriteUrlActor(
                                              new File(outGoodFile),
                                              new File(outBrokenFile),
-                                             charset, append)), name = "writeUrl")
+                                             charset, append, tell)), name = "writeUrl")
 
     // Create actor that will read urls to be checked from input file
     val readUrl: ActorRef = _system.actorOf(Props(new ReadUrlActor(
@@ -94,11 +95,13 @@ object CheckLinksApplication extends App {
   val broken = "broken.tmp" // Temporary file of broken links
   val broken2 = "broken2.tmp" // Temporary file of broken links
   val startDate = new Date()
-  println("Starting check - " + startDate)
+
+  println("\nCheck Links - BIREME/PAHO/WHO (c)\n")
+  println("Start checking - " + startDate)
 
   // First check
   //val lkNum1 = Source.fromFile(args(0)).getLines.size - bug  if contains invalid char
-  println("\nStep 1 - Checking links")
+  println("\n+++ Step 1 - Checking all links (parallel mode)")
   check(args(0), args(1), broken, charset, append, numOfCheckers)
   println("Step 1 - Check finished")
 
@@ -111,8 +114,8 @@ object CheckLinksApplication extends App {
 
   // Second check - only broken links
   //val lkNum2 = Source.fromFile(broken).getLines.size
-  println("\nStep 2 - Rechecking broken links")
-  check(broken, args(1), broken2, charset, append = true, numOfCheckers)
+  println("\n+++ Step 2 - Rechecking only broken links (parallel mode)")
+  check(broken, args(1), broken2, charset, append = true, numOfCheckers, tell=50)
   println("Step 2 - Check finished")
 
   // Waiting 'waitMinutes' minutes
@@ -122,8 +125,8 @@ object CheckLinksApplication extends App {
 
   // Second check - only broken links (one by one)
   //val lkNum2 = Source.fromFile(broken).getLines.size
-  println("\nStep 3 - Rechecking broken links (one by one)")
-  check(broken2, args(1), args(2), charset, append = true, 1)
+  println("\n+++ Step 3 - Rechecking remaining broken links (sequential mode)")
+  check(broken2, args(1), args(2), charset, append = true, numberOfCheckers=1, tell=10)
   println("Step 3 - Check finished")
 
   // Delete temporary files
@@ -132,7 +135,7 @@ object CheckLinksApplication extends App {
 
   val endDate = new Date()
   val elapsedTime = endDate.getTime - startDate.getTime
-  val teller = new Teller()
+  val teller = new Teller(tell = 1)
   println("\nCheck finished - " + endDate + ". Processing time:"
                                          + teller.getTimeStr(elapsedTime))
 }

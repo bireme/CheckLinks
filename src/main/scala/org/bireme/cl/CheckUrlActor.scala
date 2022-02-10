@@ -18,8 +18,8 @@ import akka.actor.ActorRef
 class CheckUrlActor(reader: ActorRef,
                     writer: ActorRef) extends Actor {
   val sleepTime: Int = 1 * 60 * 1000 // 1 minute
-  val maxBadUrls: Int = 200
-  var numOfBadUrls: Int = 0
+  //val maxBadUrls: Int = 200
+  //var numOfBadUrls: Int = 0
   val clCore = new CheckLinksCore()
 
   def receive: Receive = {
@@ -28,12 +28,12 @@ class CheckUrlActor(reader: ActorRef,
     case url: String =>
       val (isOk, curl) = checkUrl(url)
       writer ! (isOk, curl)
-      if (!isOk) numOfBadUrls += 1
+      /*if (!isOk) numOfBadUrls += 1
       if (numOfBadUrls >= maxBadUrls) {
-        println("*")
+        println(s">>waiting $sleepTime ms")
         Thread.sleep(sleepTime.toLong)
         numOfBadUrls = 0
-      }
+      }*/
       reader ! AskByUrl
     case Finish => () // println("CheckUrlActor finishing.")
   }

@@ -21,14 +21,15 @@ import java.nio.file.{Files,StandardOpenOption}
 class WriteUrlActor(goodUrlFile: File,
                     brokenUrlFile: File,
                     charset: Charset,
-                    append: Boolean = false) extends Actor {
+                    append: Boolean = false,
+                    tell: Int) extends Actor {
   val option: StandardOpenOption = if (append) StandardOpenOption.APPEND
                else StandardOpenOption.TRUNCATE_EXISTING
   val goodWriter: BufferedWriter = Files.newBufferedWriter(goodUrlFile.toPath, charset,
                     StandardOpenOption.CREATE,StandardOpenOption.WRITE, option)
   val brokenWriter: BufferedWriter = Files.newBufferedWriter(brokenUrlFile.toPath, charset,
                     StandardOpenOption.CREATE,StandardOpenOption.WRITE, option)
-  val teller: Teller = new Teller()
+  val teller: Teller = new Teller(tell)
 
   teller.start()
 

@@ -2,8 +2,8 @@ name := "CheckLinks"
 
 version := "1.0"
 
-scalaVersion := /*"2.13.5"*/ "2.12.9"  // casbah congelado
-val akkaVersion = "2.6.15" //"2.5.25"
+scalaVersion := /*"2.13.7"*/ "2.12.9"  // casbah congelado
+val akkaVersion = "2.6.18" //"2.6.15"
 val httpclientVersion = "4.5.13" //"4.5.10"
 val casbahVersion = "3.1.1"
 val scalajVersion = "2.4.2" //"2.4.1"
