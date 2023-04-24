@@ -67,8 +67,8 @@ class ReadUrlActor(file: File,
       case ex: Exception =>
         println("[ERROR] bad input line => " + ex.toString)
         //ex.printStackTrace()
-        //getPipedLine()
-        None
+        getPipedLine
+        //None
     }
   }
 

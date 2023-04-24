@@ -108,10 +108,10 @@ class Teller(tell: Int) {
     val seconds = modMinutes / second
 
     val tstr = "" +
-    (if (days > 0) { days + "d"} else "") +
-    (if (hours > 0) { hours + "h"} else "") +
-    (if (minutes > 0) { minutes + "m"} else "") +
-    (if (seconds > 0) { seconds + "s"} else "")
+    (if (days > 0) { s"${days}d"} else "") +
+    (if (hours > 0) { s"${hours}h"} else "") +
+    (if (minutes > 0) { s"${minutes}m"} else "") +
+    (if (seconds > 0) { s"${seconds}s"} else "")
 
     if (tstr.isEmpty) "0s" else tstr
   }

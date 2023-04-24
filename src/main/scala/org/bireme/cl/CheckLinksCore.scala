@@ -4,6 +4,13 @@ import java.net.{URI, URL, URLDecoder}
 import scalaj.http.HttpOptions.HttpOption
 import scalaj.http.{Http, HttpOptions}
 
+import java.net.http.{HttpClient, HttpRequest}
+import java.net.http.HttpClient.{Redirect, Version}
+import java.net.http.HttpResponse.BodyHandlers
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import java.time.Duration
+import javax.net.ssl.{HostnameVerifier, HttpsURLConnection, SSLContext, SSLSession, TrustManager, X509TrustManager}
 import scala.annotation.tailrec
 import scala.collection.concurrent.TrieMap
 import scala.util.{Failure, Success, Try}
@@ -17,13 +24,43 @@ class CheckLinksCore {
   val REDIRECTED_TOO_MANY_TIMES_EXCEPTION: Int = 1017
   val UNEXPECTED_END_OF_FILE_EXCEPTION: Int = 1018
   val CONNECTION_RESET_EXCEPTION: Int = 1019
+  val SSL_EXCEPTION: Int = 1020
+  val UNSUPPORTED_ENCODING_EXCEPTION = 1021
+  val SSL_PROTOCOL_EXCEPTION = 1022
+  val ILLEGAL_ARGUMENT_EXCEPTION = 1023
+  val DNS_EXCEPTION = 1024
   val UNKNOWN: Int = 1100
-
 
   val brokenPaths: TrieMap[String, Int] = new TrieMap[String, Int] // Concurrent map
 
+  val timeout: Int = 4 * 60 * 1000
+
+  /*
+  // https://stackoverflow.com/questions/52988677/allow-insecure-https-connection-for-java-jdk-11-httpclient
+  val trustAllCerts: Array[TrustManager] = Array[TrustManager] {
+    new X509TrustManager() {
+      def getAcceptedIssuers(): Array[java.security.cert.X509Certificate] = null
+      def checkClientTrusted(certs: Array[java.security.cert.X509Certificate], authType: String): Unit = {}
+      def checkServerTrusted(certs: Array[java.security.cert.X509Certificate], authType: String): Unit = {}
+    }
+  }
+
+  val sslContext: SSLContext = SSLContext.getInstance("TLS")
+  sslContext.init(null, trustAllCerts, new SecureRandom()) */
+
+  //disableSslVerification()
+
+  val client: HttpClient = HttpClient.newBuilder()
+    .version(Version.HTTP_1_1)
+    .followRedirects(Redirect.ALWAYS)
+    .connectTimeout(Duration.ofSeconds(timeout))
+    //.sslContext(sslContext)
+    //.proxy(ProxySelector.of(new InetSocketAddress("proxy.example.com", 80)))
+    //.authenticator(Authenticator.getDefault())
+    .build()
+
   def checkUrl(surl: String): Int = {
-    Try (new URL(urlEncode(surl))) match {
+    Try (new URL(surl)) orElse Try (new URL(urlEncode(surl))) match {
       case Success(url) =>
         url.getProtocol match {
           case "http" | "https" => httpCheck(url)
@@ -95,15 +132,36 @@ class CheckLinksCore {
     }
   }
 
-  private def check(url: String): Int = {
+  private def check0(url: String): Int = {
     val timeout: Int = 4 * 60 * 1000
 
     val options: Seq[HttpOption] = Seq(
       HttpOptions.connTimeout(timeout),
       HttpOptions.readTimeout(timeout),
-      HttpOptions.followRedirects(true))
+      HttpOptions.followRedirects(true),
+      HttpOptions.allowUnsafeSSL)
 
     Try(Http(url).options(options).asString.code) match {
+      case Success(value) => value
+      case Failure(exception) => getErrorCode(exception)
+    }
+  }
+
+  private def check(url: String): Int = {
+    Try {
+      val request = HttpRequest.newBuilder()
+        .uri(URI.create(url))
+        .setHeader("User-Agent", "Wget/1.16.1 (linux-gnu)")
+        .setHeader("Accept", "text/*;*/*")
+        .setHeader("Accept-Encoding", "*")
+        .method("HEAD", HttpRequest.BodyPublishers.noBody())
+        //.setHeader("Connection", "Keep-Alive")
+        //.setHeader("Connection", "close")
+        .build()
+
+      val response = client.send(request, BodyHandlers.ofString())
+      response.statusCode()
+    } match {
       case Success(value) => value
       case Failure(exception) => getErrorCode(exception)
     }
@@ -115,13 +173,20 @@ class CheckLinksCore {
       case _: java.net.UnknownHostException => UNKNOWN_HOST_EXCEPTION
       case _: java.net.ProtocolException => REDIRECTED_TOO_MANY_TIMES_EXCEPTION
       case ex: java.net.ConnectException =>
-        if (ex.getMessage contains "timed out") CONNECT_TIMEOUT_EXCEPTION
+        if (Option(ex.getMessage).getOrElse("") contains "timed out") CONNECT_TIMEOUT_EXCEPTION
         else UNKNOWN
       case ex: java.net.SocketException =>
-        if (ex.getMessage contains "end of file") UNEXPECTED_END_OF_FILE_EXCEPTION
-        else if (ex.getMessage contains "Connection reset") CONNECTION_RESET_EXCEPTION
+        if (Option(ex.getMessage).getOrElse("") contains "end of file") UNEXPECTED_END_OF_FILE_EXCEPTION
+        else if (Option(ex.getMessage).getOrElse("") contains "Connection reset") CONNECTION_RESET_EXCEPTION
         else SOCKET_EXCEPTION
       case _: java.net.SocketTimeoutException => SOCKET_TIMEOUT_EXCEPTION
+      case _: javax.net.ssl.SSLException => SSL_EXCEPTION
+      case _: java.io.UnsupportedEncodingException => UNSUPPORTED_ENCODING_EXCEPTION
+      case _: javax.net.ssl.SSLProtocolException => SSL_PROTOCOL_EXCEPTION
+      case _: java.lang.IllegalArgumentException => ILLEGAL_ARGUMENT_EXCEPTION
+      case ex: java.io.IOException =>
+        if (Option(ex.getMessage).getOrElse("") contains "DNS") DNS_EXCEPTION
+        else SOCKET_EXCEPTION
       case _ =>
         println(s"check ERROR: ${exception.toString}")
         UNKNOWN
@@ -140,6 +205,50 @@ class CheckLinksCore {
     val uri: URI = new URI(url.getProtocol, url.getUserInfo, url.getHost, url.getPort, url.getPath, url.getQuery, url.getRef)
     //url.getPort, URLEncoder.encode(url.getPath, "utf-8"), url.getQuery, url.getRef)
     uri.toURL.toString  // Do not treat # in the URLpath
+  }
+
+  //https://stackoverflow.com/questions/19540289/how-to-fix-the-java-security-cert-certificateexception-no-subject-alternative
+  private def disableSslVerification(): Unit = {
+    Try {
+
+      /*
+       // https://stackoverflow.com/questions/52988677/allow-insecure-https-connection-for-java-jdk-11-httpclient
+       val trustAllCerts: Array[TrustManager] = Array[TrustManager] {
+         new X509TrustManager() {
+           def getAcceptedIssuers(): Array[java.security.cert.X509Certificate] = null
+           def checkClientTrusted(certs: Array[java.security.cert.X509Certificate], authType: String): Unit = {}
+           def checkServerTrusted(certs: Array[java.security.cert.X509Certificate], authType: String): Unit = {}
+         }
+       }
+
+       val sslContext: SSLContext = SSLContext.getInstance("TLS")
+       sslContext.init(null, trustAllCerts, new SecureRandom()) */
+
+      // Create a trust manager that does not validate certificate chains
+      val trustAllCerts = Array[TrustManager] {
+        new X509TrustManager() {
+          def getAcceptedIssuers: Array[java.security.cert.X509Certificate] = null
+          def checkClientTrusted(certs: Array[X509Certificate], authType: String): Unit = {}
+          def checkServerTrusted(certs: Array[X509Certificate], authType: String): Unit = {}
+        }
+      }
+
+      // Install the all-trusting trust manager
+      val sc: SSLContext = SSLContext.getInstance("SSL")
+      sc.init(null, trustAllCerts, new java.security.SecureRandom())
+      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory)
+
+      // Create all-trusting host name verifier
+      val allHostsValid: HostnameVerifier = new HostnameVerifier() {
+        def verify(hostname: String, session: SSLSession): Boolean = true
+      }
+
+      // Install the all-trusting host verifier
+      HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid)
+    } match {
+      case Success(_) => ()
+      case Failure(exception) => exception.printStackTrace()
+    }
   }
 }
 object CheckLinksCore extends App {
