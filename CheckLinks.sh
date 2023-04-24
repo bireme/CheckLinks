@@ -1,6 +1,6 @@
 #!/bin/bash
 
-JAVA_HOME=/usr/local/java8   # Chamada via ssh de outra maquina
+JAVA_HOME=/usr/local/java11   # Chamada via ssh de outra maquina
 PATH=$JAVA_HOME/bin:$PATH
 CHECK_LINKS_HOME=/home/javaapps/sbt-projects/CheckLinks
 
@@ -22,5 +22,5 @@ echo
 echo "-----------------------------------------------------------------------"
 echo "CheckLinksApplication - checking $lines links"
 #sbt "run-main org.bireme.cl.CheckLinksApplication $1 $2 $3 $5"
-java -cp $CHECK_LINKS_HOME/CheckLinks.jar org.bireme.cl.CheckLinksApplication $1 $2 $3 $4 $5 $6
+java -cp $CHECK_LINKS_HOME/target/scala-2.12/CheckLinks-assembly-1.0.jar org.bireme.cl.CheckLinksApplication $1 $2 $3 $4 $5 $6
 
